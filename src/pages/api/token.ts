@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { generateRandomAlphanumeric } from "@/lib/util";
+import { auth, requireAuth } from "@clerk/nextjs/server";
 
 import { AccessToken } from "livekit-server-sdk";
 import type { AccessTokenOptions, VideoGrant } from "livekit-server-sdk";
@@ -14,11 +15,16 @@ const createToken = (userInfo: AccessTokenOptions, grant: VideoGrant) => {
   return at.toJwt();
 };
 
-export default async function handleToken(
+export default requireAuth(async function handleToken(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
   try {
+    const hasPermission = await auth().hasPermission("checkout:view");
+    if (!hasPermission) {
+      return res.status(403).json({ message: "Active subscription required." });
+    }
+
     if (!apiKey || !apiSecret) {
       res.statusMessage = "Environment variables aren't set up correctly";
       res.status(500).end();

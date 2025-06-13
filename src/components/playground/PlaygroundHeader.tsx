@@ -1,4 +1,5 @@
 import { UserButton } from "@clerk/nextjs";
+import Link from 'next/link';
 import { Button } from "@/components/button/Button";
 import { LoadingSVG } from "@/components/button/LoadingSVG";
 import { SettingsDropdown } from "@/components/playground/SettingsDropdown";
@@ -52,6 +53,9 @@ export const PlaygroundHeader = ({
           </a>
         )}
         {config.settings.editable && <SettingsDropdown />}
+        <Link href="/subscribe">
+          <span className="text-white hover:text-white/80 ml-2">Subscribe</span>
+        </Link>
         <UserButton afterSignOutUrl="/" />
         <Button
           accentColor={
