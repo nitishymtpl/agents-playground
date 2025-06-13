@@ -1,4 +1,5 @@
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
+import Link from 'next/link';
 import { Button } from "@/components/button/Button";
 import { LoadingSVG } from "@/components/button/LoadingSVG";
 import { SettingsDropdown } from "@/components/playground/SettingsDropdown";
@@ -52,7 +53,26 @@ export const PlaygroundHeader = ({
           </a>
         )}
         {config.settings.editable && <SettingsDropdown />}
-        <UserButton afterSignOutUrl="/" />
+        <SignedIn>
+          <UserButton
+            afterSignOutUrl="/"
+            userProfileUrl="/user"
+            userProfileProps={{
+              additionalMenuItems: [
+                { label: "Billing", url: "/subscribe" }
+              ]
+            }}
+          />
+        </SignedIn>
+        <SignedOut>
+          <Link href="/sign-in" passHref>
+            <Button accentColor={accentColor} className="text-sm lg:text-base">Sign In</Button>
+          </Link>
+          {/* Optional: A subscribe button for signed-out users, though they'll be prompted to sign in on the subscribe page */}
+          {/* <Link href="/subscribe" passHref>
+            <Button accentColor={accentColor} className="text-sm lg:text-base">Subscribe</Button>
+          </Link> */}
+        </SignedOut>
         <Button
           accentColor={
             connectionState === ConnectionState.Connected ? "red" : accentColor
