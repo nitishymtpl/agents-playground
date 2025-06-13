@@ -54,24 +54,20 @@ export const PlaygroundHeader = ({
         )}
         {config.settings.editable && <SettingsDropdown />}
         <SignedIn>
-          <UserButton
-            afterSignOutUrl="/"
-            userProfileUrl="/user"
-            userProfileProps={{
-              additionalMenuItems: [
-                { label: "Billing", url: "/subscribe" }
-              ]
-            }}
-          />
+          <UserButton afterSignOutUrl="/">
+            <UserButton.MenuItems>
+              <UserButton.Link href="/user" label="Manage Account" />
+              <UserButton.Link href="/subscribe" label="Billing" />
+            </UserButton.MenuItems>
+          </UserButton>
         </SignedIn>
         <SignedOut>
           <Link href="/sign-in" passHref>
             <Button accentColor={accentColor} className="text-sm lg:text-base">Sign In</Button>
           </Link>
-          {/* Optional: A subscribe button for signed-out users, though they'll be prompted to sign in on the subscribe page */}
-          {/* <Link href="/subscribe" passHref>
+          <Link href="/subscribe" passHref>
             <Button accentColor={accentColor} className="text-sm lg:text-base">Subscribe</Button>
-          </Link> */}
+          </Link>
         </SignedOut>
         <Button
           accentColor={
