@@ -15,6 +15,8 @@ import { ConfigProvider, useConfig } from "@/hooks/useConfig";
 import { ConnectionMode, ConnectionProvider, useConnection } from "@/hooks/useConnection";
 import { useMemo } from "react";
 import { ToastProvider, useToast } from "@/components/toast/ToasterProvider";
+import { getAuth } from "@clerk/nextjs/server";
+import { type GetServerSideProps } from "next";
 
 const themeColors = [
   "cyan",
@@ -40,6 +42,21 @@ export default function Home() {
     </ToastProvider>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
+  const { userId } = getAuth(ctx.req);
+
+  if (!userId) {
+    return {
+      redirect: {
+        destination: "/sign-in",
+        permanent: false,
+      },
+    };
+  }
+
+  return { props: {} };
+};
 
 export function HomeInner() {
   const { shouldConnect, wsUrl, token, mode, connect, disconnect } =

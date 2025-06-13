@@ -1,5 +1,4 @@
-import { UserButton, SignedIn, SignedOut } from "@clerk/nextjs";
-import Link from "next/link";
+import { UserButton } from "@clerk/nextjs";
 import { Button } from "@/components/button/Button";
 import { LoadingSVG } from "@/components/button/LoadingSVG";
 import { SettingsDropdown } from "@/components/playground/SettingsDropdown";
@@ -53,14 +52,7 @@ export const PlaygroundHeader = ({
           </a>
         )}
         {config.settings.editable && <SettingsDropdown />}
-        <SignedIn>
-          <UserButton afterSignOutUrl="/" />
-        </SignedIn>
-        <SignedOut>
-          <Link href="/sign-in">
-            <button className="lk-button">Sign In</button>
-          </Link>
-        </SignedOut>
+        <UserButton afterSignOutUrl="/" />
         <Button
           accentColor={
             connectionState === ConnectionState.Connected ? "red" : accentColor
