@@ -1,17 +1,12 @@
-import { authMiddleware } from "@clerk/nextjs";
+import { clerkMiddleware } from '@clerk/nextjs/server';
 
-export default authMiddleware({
-  // Ensure that routes like /api/token are protected
-  // Add any public routes to this array.
-  // By default, all routes are protected and this specifies exceptions.
-  publicRoutes: [
-    "/sign-in(.*)",
-    "/sign-up(.*)",
-    // Add other public routes here if needed, e.g., marketing pages
-    // "/", // If you want the home page to be public before sign-in
-  ],
-});
+export default clerkMiddleware();
 
 export const config = {
-  matcher: ['/((?!.+\.[\w]+$|_next).*)', '/', '/(api|trpc)(.*)'],
+  matcher: [
+    // Skip Next.js internals and all static files, unless found in search params
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Always run for API routes
+    '/(api|trpc)(.*)',
+  ],
 };
