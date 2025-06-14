@@ -1,12 +1,13 @@
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
 import { Button } from "@/components/button/Button";
 import { LoadingSVG } from "@/components/button/LoadingSVG";
 import { SettingsDropdown } from "@/components/playground/SettingsDropdown";
 import { useConfig } from "@/hooks/useConfig";
 import { ConnectionState } from "livekit-client";
+import Link from "next/link";
 import { ReactNode } from "react";
 
-type PlaygroundHeader = {
+type PlaygroundHeaderProps = {
   logo?: ReactNode;
   title?: ReactNode;
   githubLink?: string;
@@ -14,6 +15,12 @@ type PlaygroundHeader = {
   accentColor: string;
   connectionState: ConnectionState;
   onConnectClicked: () => void;
+};
+
+const planIdToName: { [key: string]: string } = {
+  'plan_basic': "Basic Plan",
+  'plan_pro': "Pro Plan",
+  'plan_enterprise': "Enterprise Plan",
 };
 
 export const PlaygroundHeader = ({
@@ -24,31 +31,68 @@ export const PlaygroundHeader = ({
   height,
   onConnectClicked,
   connectionState,
-}: PlaygroundHeader) => {
+}: PlaygroundHeaderProps) => {
   const { config } = useConfig();
+  const { user, isSignedIn } = useUser();
+
+  const subscriptionPlanId = user?.publicMetadata?.lemonSqueezyPlanId as string | undefined;
+  const subscriptionStatus = user?.publicMetadata?.lemonSqueezyStatus as string | undefined;
+  const creditsAvailable = user?.publicMetadata?.creditsAvailable as number | undefined;
+  const customerPortalUrl = user?.publicMetadata?.lemonSqueezyCustomerPortalUrl as string | undefined;
+
+  const planDisplayName = subscriptionPlanId ? (planIdToName[subscriptionPlanId] || subscriptionPlanId) : "Free Tier";
+  const creditsDisplay = typeof creditsAvailable === 'number' ? creditsAvailable : 0;
+  const statusDisplay = subscriptionStatus || "N/A";
+
+  const isValidCustomerPortalUrl = customerPortalUrl && customerPortalUrl.startsWith('http');
+
   return (
     <div
-      className={`flex gap-4 pt-4 text-${accentColor}-500 justify-between items-center shrink-0`}
+      className={`flex flex-wrap gap-x-4 gap-y-2 pt-4 text-${accentColor}-500 justify-between items-center shrink-0`}
       style={{
         height: height + "px",
       }}
     >
-      <div className="flex items-center gap-3 basis-2/3">
-        <div className="flex lg:basis-1/2">
+      <div className="flex items-center gap-3 basis-full md:basis-auto order-1 md:order-1">
+        <div className="flex">
           <a href="https://livekit.io">{logo ?? <LKLogo />}</a>
         </div>
-        <div className="lg:basis-1/2 lg:text-center text-xs lg:text-base lg:font-semibold text-white">
+        <div className="lg:text-center text-xs lg:text-base lg:font-semibold text-white truncate">
           {title}
         </div>
       </div>
-      <div className="flex basis-1/3 justify-end items-center gap-2">
+
+      {/* Subscription Info Display - Placed to the left of action buttons */}
+      {isSignedIn && (
+        <div className="text-xs text-white/70 text-left order-3 md:order-2 flex-grow md:flex-grow-0">
+          <div>Plan: <span className="font-semibold text-white">{planDisplayName}</span> (Status: <span className="font-semibold text-white">{statusDisplay}</span>)</div>
+          <div>Credits: <span className="font-semibold text-white">{creditsDisplay}</span></div>
+        </div>
+      )}
+
+      <div className="flex basis-full md:basis-auto justify-end items-center gap-2 order-2 md:order-3 ml-auto">
         {githubLink && (
           <a
             href={githubLink}
             target="_blank"
             className={`text-white hover:text-white/80`}
+            title="GitHub Repository"
           >
             <GithubSVG />
+          </a>
+        )}
+        <Link href="/pricing" className="text-white hover:text-white/80 text-sm font-medium py-1 px-2 rounded hover:bg-white/10" title="Pricing">
+          Pricing
+        </Link>
+        {isValidCustomerPortalUrl && (
+          <a
+            href={customerPortalUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white bg-sky-500 hover:bg-sky-600 text-sm font-medium py-1 px-2 rounded"
+            title="Manage Subscription"
+          >
+            Manage Subscription
           </a>
         )}
         {config.settings.editable && <SettingsDropdown />}
@@ -75,6 +119,7 @@ export const PlaygroundHeader = ({
   );
 };
 
+// ... (LKLogo and GithubSVG components remain unchanged)
 const LKLogo = () => (
   <svg
     width="28"
