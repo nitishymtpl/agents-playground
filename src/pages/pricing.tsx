@@ -4,9 +4,12 @@ import { useUser } from '@clerk/nextjs';
 import Head from 'next/head';
 
 // Define plan data, including placeholder Lemon Squeezy Variant IDs
+const basicVariantId = process.env.NEXT_PUBLIC_LEMONSQUEEZY_BASIC_VARIANT_ID || 'plan_basic_fallback';
+const proVariantId = process.env.NEXT_PUBLIC_LEMONSQUEEZY_PRO_VARIANT_ID || 'plan_pro_fallback';
+
 const plans = [
   {
-    id: 'plan_basic', // Placeholder Lemon Squeezy Variant ID (e.g., 12345)
+    id: basicVariantId, // Use actual Lemon Squeezy Variant ID from env
     name: 'Basic',
     description: 'Perfect for individuals starting out.',
     price: '$10',
@@ -17,7 +20,7 @@ const plans = [
     popular: false,
   },
   {
-    id: 'plan_pro', // Placeholder Lemon Squeezy Variant ID (e.g., 67890)
+    id: proVariantId, // Use actual Lemon Squeezy Variant ID from env
     name: 'Pro',
     description: 'Ideal for professionals and small teams.',
     price: '$25',
@@ -28,7 +31,7 @@ const plans = [
     popular: true,
   },
   {
-    id: 'plan_enterprise', // Placeholder Lemon Squeezy Variant ID (e.g., 13579)
+    id: 'plan_enterprise', // This plan might not have a typical variant ID if it's "Contact Us"
     name: 'Enterprise',
     description: 'Tailored for large organizations.',
     price: 'Contact Us',
@@ -65,9 +68,8 @@ const PricingPage = () => {
     }
 
     // Construct the Lemon Squeezy checkout URL
-    // Note: Variant IDs are the actual IDs from your Lemon Squeezy products/variants
-    // The 'plan_basic', 'plan_pro' are placeholders here and in the webhook's planCredits map.
-    // Replace them with actual Variant IDs from your Lemon Squeezy store.
+    // Note: Variant IDs are now sourced from environment variables for Basic and Pro plans.
+    // The 'plan_enterprise' ID is handled as a special case.
     let checkoutUrl = `https://${storeDomain}/checkout/buy/${variantId}`;
 
     if (user?.id) {
